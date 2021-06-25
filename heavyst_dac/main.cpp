@@ -33,25 +33,27 @@ section heavyst_dac(const std::vector<int> v, int begin, int end) {
 	}else {
 		auto left = heavyst_dac(v, begin, (begin+end)/2);
 		auto right = heavyst_dac(v, (begin+end)/2, end);
-		section mid(v, (begin+end)/2, (begin+end)/2+1);
+		section midl(v, (begin+end)/2-1, (begin+end)/2);
+		section midr(v, (begin+end)/2, (begin+end)/2+1);
 		{
-			auto tmp = mid.sum;
-			auto tmppos = mid.x-1;
-			while (mid.sum >= tmp && tmppos >= 0) {
-				tmp = mid.sum;
-				mid = section(tmppos, mid.y, mid.sum+v.at(tmppos));
+			auto tmp = midl.sum;
+			auto tmppos = midl.x-1;
+			while (midl.sum >= tmp && tmppos >= 0) {
+				tmp = midl.sum;
+				midl = section(tmppos, midl.y, midl.sum+v.at(tmppos));
 				tmppos--;
 			}
-			mid = section(v, ++++tmppos, mid.y);
-			tmp = mid.sum;
-			tmppos = mid.y+1;
-			while (mid.sum >= tmp && tmppos < v.size()) {
-				tmp = mid.sum;
-				mid = section(mid.x, tmppos, mid.sum+v.at(tmppos));
+			midl = section(v, ++++tmppos, midl.y);
+			tmp = midr.sum;
+			tmppos = midr.y+1;
+			while (midr.sum >= tmp && tmppos < v.size()) {
+				tmp = midr.sum;
+				midr = section(midr.x, tmppos, midr.sum+v.at(tmppos));
 				tmppos++;
 			}
-			mid = section(v, mid.x, ----tmppos);
+			midr = section(v, midr.x, ----tmppos);
 		}
+		section mid = std::max({midl, midr, section(v, midl.x, midr.y)});
 		std::cout << "left, right, mid: " << left.sum << ", " << right.sum << ", " << mid.sum << '\n';
 		return std::max({left, right, mid});
 	}
@@ -59,7 +61,8 @@ section heavyst_dac(const std::vector<int> v, int begin, int end) {
 
 int main() {
 	std::vector<int> v =
-	{-1,5,4,4,-3,2,-9,5,-2};
+	{-1,5,4,4,-3,2,-9,5};
+	// {-1,2,3,-4,2,5,1,-3};
 	std::cout << "initial array: ";
 	for (auto&a:v) std::cout << a << ' '; std::cout << '\n';
 	auto hoge = heavyst_dac(v, 0, v.size());
